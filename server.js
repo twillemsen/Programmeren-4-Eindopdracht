@@ -6,6 +6,7 @@ const studentenhuis_routes = require('./routes/studentenhuis_routes');
 // const ApiError
 const ApiError = require('./model/ApiError');
 const config = require('./config/config');
+const mysql = require('mysql');
 
 
 const port = process.env.PORT || config.webPort;
