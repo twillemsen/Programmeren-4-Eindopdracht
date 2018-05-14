@@ -26,6 +26,13 @@ app.get('/test', (req, res, next) => {
     });
 });
 
+app.use(function (error, req, res, next) {
+	console.error(error.toString());
+	res.status(500).json({
+		message: error
+	}).end();
+});
+
 app.listen(port, () => {
     console.log('Server running on port ' + port);
 });
