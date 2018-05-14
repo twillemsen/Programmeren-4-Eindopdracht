@@ -1,7 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-// const routes
+const auth_routes = require('./routes/authentication.routes');
+const auth_controller = require('./controllers/authentication.controller');
 // const ApiError
 const config = require('./config/config');
 
@@ -12,6 +13,10 @@ let app = express();
 app.use(bodyParser.json());
 
 app.use(morgan('dev'));
+
+app.use('/api', auth_routes);
+
+app.all('*', auth_controller.validateToken);
 
 
 // Test endpoint:
