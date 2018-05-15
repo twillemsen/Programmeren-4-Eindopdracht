@@ -14,15 +14,25 @@ module.exports = {
             if (error) {
                 next(error);
             } else {
-                if (rows[0].Password === password) {
-                    const userinfo = {
-                        token: auth.encodeToken(email)
+                try {
+                    if (rows[0].Password === password) {
+                        const userinfo = {
+                            token: auth.encodeToken({
+                                "ID": rows.insertId, 
+                                "email": email}),
+                            email: email
+                        }
+            
+                        res.status(200).json(userinfo).end();
+                        console.log('login succesful');
+                    } else {
+                        const error = new ApiError('Een of meer properties in de request body ontbreken of zijn foutief', 412);
+                        res.status(412).send(error);
+                        return;
                     }
-        
-                    res.status(200).json(userinfo).end();
-                    console.log('login succesful');
-                } else {
-                    const error = new ApiError('Een of meer properties in de request body ontbreken of zijn foutief', 412);
+                }
+                catch (ex) {
+                    const error = new ApiError('Email bestaat niet', 412);
                     res.status(412).send(error);
                     return;
                 }

@@ -102,7 +102,7 @@ describe('Registration', () => {
 
                 let response = res.body;
 
-                response.should.have.property('message').equals('Firstname moet langer zijn dan 2 karakters');
+                response.should.have.property('message').equals('Firstname moet langer zijn dan 1 karakter');
                 response.should.have.property('code').equals(412);
                 response.should.have.property('datetime').equals(res.body.datetime);
 
@@ -145,7 +145,7 @@ describe('Registration', () => {
 
                 let response = res.body;
 
-                response.should.have.property('message').equals('Lastname moet langer zijn dan 2 karakters');
+                response.should.have.property('message').equals('Lastname moet langer zijn dan 1 karakter');
                 response.should.have.property('code').equals(412);
                 response.should.have.property('datetime').equals(res.body.datetime);
 
@@ -179,31 +179,86 @@ describe('Registration', () => {
 describe('Login', () => {
 
     it('should return a token when providing valid information', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+            .post('/api/login')
+            .send({
+                "email": "abc@def.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+
+                let response = res.body;
+                let validToken = res.body.token;
+
+                response.should.have.property('token').equals(validToken);
+                response.should.have.property('email').equals('abc@def.nl');
+
+                done();
+            });
+    });
 
     it('should throw an error when email does not exist', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+            .post('/api/login')
+            .send({
+                "email": "dezeemailbestaatniet@test.nl",
+                "password": "blablabla"
+            })
+            .end((err, res) => {
+                res.should.have.status(412);
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Email bestaat niet');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when email exists but password is invalid', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+            .post('/api/login')
+            .send({
+                "email": "abc@def.nl",
+                "password": "blablabla"
+            })
+            .end((err, res) => {
+                res.should.have.status(412);
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when using an invalid email', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+            .post('/api/login')
+            .send({
+                "email": "dezeemailbestaatniet@test.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.should.have.status(412);
+                res.body.should.be.a('object');
 
-})
+                let response = res.body;
+
+                response.should.have.property('message').equals('Email bestaat niet');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
+});
