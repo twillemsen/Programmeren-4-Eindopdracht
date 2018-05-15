@@ -37,11 +37,13 @@ app.use('*', (req, res, next) => {
     next('Endpoint does not exist');
 })
 
+
 app.use(function (error, req, res, next){
-    console.error(error.toString());
-    res.status(500).json({
-        message: error
-    }).end()
+    let end = res.end;
+    let status = error.code;
+    console.error(JSON.stringify(error));
+    res.status(status).json(error).end();
+
 })
 
 // app.use((err, req, res, next) => {

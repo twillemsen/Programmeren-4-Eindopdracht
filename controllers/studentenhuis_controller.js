@@ -1,7 +1,10 @@
-const Studentenhuis = require ('../model/Studentenhuis')
-const assert = require('assert')
+const Studentenhuis = require ('../model/Studentenhuis');
+const assert = require('assert');
+let db = require('../config/db.improved');
+const auth = require('../auth/authentication');
 
-let huislist = [];
+let payload = auth.decodeToken;
+
 
 module.exports = {
     createStudentenhuis(req, res, next){
@@ -16,7 +19,7 @@ module.exports = {
         //deze code aanpassen naar SQL zodra de authenticatie klaar is
         try{
         let huis = new Studentenhuis(name, address);
-        huislist.push(huis);
+        console.log(payload.sub);
         res.status(200).json(huis).end();
         }catch(ex){
             console.log(JSON.stringify(ex));
