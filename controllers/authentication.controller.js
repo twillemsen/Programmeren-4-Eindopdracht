@@ -10,11 +10,11 @@ module.exports = {
         let email = req.body.email;
         let password = req.body.password;
 
-        db.query('SELECT Password FROM user WHERE Email=' + email, (error, rows, fields) => {
+        db.query('SELECT Password FROM user WHERE Email = ?', [email], (error, rows, fields) => {
             if (error) {
                 next(error);
             } else {
-                if (rows === password) {
+                if (rows[0].Password === password) {
                     const userinfo = {
                         token: auth.encodeToken(email)
                     }
@@ -41,6 +41,30 @@ module.exports = {
         }
         catch (ex) {
             const error = new ApiError('Een of meer properties in de request body ontbreken of zijn foutief', 412);
+            res.status(412).send(error);
+            return;
+        }
+
+        if (req.body.firstname.length < 2) {
+            const error = new ApiError('Firstname moet langer zijn dan 1 karakter', 412);
+            res.status(412).send(error);
+            return;
+        }
+
+        if (req.body.lastname.length < 2) {
+            const error = new ApiError('Lastname moet langer zijn dan 1 karakter', 412);
+            res.status(412).send(error);
+            return;
+        }
+
+        function validateEmail(email) 
+        {
+            var re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        }
+
+        if (!validateEmail(req.body.email)) {
+            const error = new ApiError('Email is niet correct', 412);
             res.status(412).send(error);
             return;
         }

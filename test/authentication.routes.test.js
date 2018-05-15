@@ -89,34 +89,92 @@ describe('Registration', () => {
     });
 
     it('should throw an error when firstname is shorter than 2 chars', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+        .post('/api/register')
+            .send({
+                "firstname": "A",
+                "lastname": "DEF",
+                "email": "abc@def.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Firstname moet langer zijn dan 2 karakters');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when no lastname is provided', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+        .post('/api/register')
+            .send({
+                "firstname": "ABC",
+                "email": "abc@def.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Een of meer properties in de request body ontbreken of zijn foutief');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when lastname is shorter than 2 chars', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+        .post('/api/register')
+            .send({
+                "firstname": "ABC",
+                "lastname": "D",
+                "email": "abc@def.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Lastname moet langer zijn dan 2 karakters');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when email is invalid', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        chai.request(server)
+        .post('/api/register')
+            .send({
+                "firstname": "ABC",
+                "lastname": "DEF",
+                "email": "abcdef.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.body.should.be.a('object');
 
-})
+                let response = res.body;
+
+                response.should.have.property('message').equals('Email is niet correct');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
+});
 
 describe('Login', () => {
 
