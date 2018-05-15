@@ -46,16 +46,8 @@ app.use(function (error, req, res, next){
 
 })
 
-// app.use((err, req, res, next) => {
-//     console.log('Catch-all error handler called.');
-//     console.log(err.toString());
-
-//     const error = new ApiError(err.toString(), 404);
-
-//     res.status(404).json(error).end();
-// })
-
-
 app.listen(port, () => {
     console.log('Server running on port ' + port);
 });
+
+module.exports = app;
