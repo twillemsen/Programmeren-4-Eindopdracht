@@ -45,7 +45,6 @@ module.exports = {
             return;
         }
 
-
         let user = req.body;
 
         let query = {
@@ -59,7 +58,10 @@ module.exports = {
                 next(error);
             } else {
                 const userinfo = {
-                    token: auth.encodeToken(user.email)
+                    token: auth.encodeToken({
+                        "ID": rows.insertId, 
+                        "email": user.email}),
+                    email: user.email
                 }
 
                 res.status(200).json(userinfo).end();
