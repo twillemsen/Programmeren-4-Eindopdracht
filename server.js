@@ -37,14 +37,21 @@ app.use('*', (req, res, next) => {
     next('Endpoint does not exist');
 })
 
-app.use((err, req, res, next) => {
-    console.log('Catch-all error handler called.');
-    console.log(err.toString());
-
-    const error = new ApiError(err.toString(), 404);
-
-    res.status(404).json(error).end();
+app.use(function (error, req, res, next){
+    console.error(error.toString());
+    res.status(500).json({
+        message: error
+    }).end()
 })
+
+// app.use((err, req, res, next) => {
+//     console.log('Catch-all error handler called.');
+//     console.log(err.toString());
+
+//     const error = new ApiError(err.toString(), 404);
+
+//     res.status(404).json(error).end();
+// })
 
 
 app.listen(port, () => {
