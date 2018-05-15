@@ -1,12 +1,12 @@
 /**
  * Testcases aimed at testing the authentication process. 
  */
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-const server = require('../server')
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server');
 
-chai.should()
-chai.use(chaiHttp)
+chai.should();
+chai.use(chaiHttp);
 
 // After successful registration we have a valid token. We export this token
 // for usage in other testcases that require login.
@@ -61,11 +61,27 @@ describe('Registration', () => {
     });
 
     it('should throw an error when the user already exists', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done();
-    })
+        chai.request(server)
+            .post('/api/register')
+            .send({
+                "firstname": "ABC",
+                "lastname": "DEF",
+                "email": "abc@def.nl",
+                "password": "geheim"
+            })
+            .end((err, res) => {
+                res.should.have.status(412);
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('message').equals('Het opgegeven email adres is al in gebruik door een account');
+                response.should.have.property('code').equals(412);
+                response.should.have.property('datetime').equals(res.body.datetime);
+
+                done();
+            });
+    });
 
     it('should throw an error when no firstname is provided', (done) => {
         chai.request(server)
@@ -94,7 +110,7 @@ describe('Registration', () => {
             .send({
                 "firstname": "A",
                 "lastname": "DEF",
-                "email": "abc@def.nl",
+                "email": "test@def.nl",
                 "password": "geheim"
             })
             .end((err, res) => {
@@ -137,7 +153,7 @@ describe('Registration', () => {
             .send({
                 "firstname": "ABC",
                 "lastname": "D",
-                "email": "abc@def.nl",
+                "email": "abc@test.nl",
                 "password": "geheim"
             })
             .end((err, res) => {

@@ -55,51 +55,65 @@ module.exports = {
             return;
         }
 
-        if (req.body.firstname.length < 2) {
-            const error = new ApiError('Firstname moet langer zijn dan 1 karakter', 412);
-            res.status(412).send(error);
-            return;
-        }
-
-        if (req.body.lastname.length < 2) {
-            const error = new ApiError('Lastname moet langer zijn dan 1 karakter', 412);
-            res.status(412).send(error);
-            return;
-        }
-
-        function validateEmail(email) 
-        {
-            var re = /\S+@\S+\.\S+/;
-            return re.test(email);
-        }
-
-        if (!validateEmail(req.body.email)) {
-            const error = new ApiError('Email is niet correct', 412);
-            res.status(412).send(error);
-            return;
-        }
-
-        let user = req.body;
-
-        let query = {
-            sql: 'INSERT INTO user(ID, Voornaam, Achternaam, Email, Password) VALUES (NULL, ?, ?, ?, ?)',
-            values: [ user.firstname, user.lastname, user.email, user.password ],
-            timeout: 2000
-        }
-
-        db.query(query, (error, rows, fields) => {
+        db.query('SELECT * FROM user WHERE Email = ?', [req.body.email], (error, rows, fields) => {
             if (error) {
                 next(error);
             } else {
-                const userinfo = {
-                    token: auth.encodeToken({
-                        "ID": rows.insertId, 
-                        "email": user.email}),
-                    email: user.email
+                try {
+                    console.log(rows[0].Email);
+                    const error = new ApiError('Het opgegeven email adres is al in gebruik door een account', 412);
+                    res.status(412).send(error);
+                    return;
                 }
-
-                res.status(200).json(userinfo).end();
-                console.log('register succesful');
+                catch (ex) {
+                    if (req.body.firstname.length < 2) {
+                        const error = new ApiError('Firstname moet langer zijn dan 1 karakter', 412);
+                        res.status(412).send(error);
+                        return;
+                    }
+            
+                    if (req.body.lastname.length < 2) {
+                        const error = new ApiError('Lastname moet langer zijn dan 1 karakter', 412);
+                        res.status(412).send(error);
+                        return;
+                    }
+            
+                    function validateEmail(email) 
+                    {
+                        var re = /\S+@\S+\.\S+/;
+                        return re.test(email);
+                    }
+            
+                    if (!validateEmail(req.body.email)) {
+                        const error = new ApiError('Email is niet correct', 412);
+                        res.status(412).send(error);
+                        return;
+                    }
+            
+                    let user = req.body;
+            
+                    let query = {
+                        sql: 'INSERT INTO user(ID, Voornaam, Achternaam, Email, Password) VALUES (NULL, ?, ?, ?, ?)',
+                        values: [ user.firstname, user.lastname, user.email, user.password ],
+                        timeout: 2000
+                    }
+            
+                    db.query(query, (error, rows, fields) => {
+                        if (error) {
+                            next(error);
+                        } else {
+                            const userinfo = {
+                                token: auth.encodeToken({
+                                    "ID": rows.insertId, 
+                                    "email": user.email}),
+                                email: user.email
+                            }
+            
+                            res.status(200).json(userinfo).end();
+                            console.log('register succesful');
+                        }
+                    });
+                }
             }
         });
     },
