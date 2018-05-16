@@ -110,31 +110,17 @@ module.exports = {
                     assert(naam, 'A name must be provided');
                     assert(adres, 'An address must be provided');
                     let huis = new Studentenhuis(naam, adres);
-                    // db.query("SELECT * FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "'", (error, rows, fields) => {
-                    //     if(error){
-                    //         next(error);
-                    //     }
-                    //     console.log(rows);
-                    //     if(rows[0].UserID !== payload.sub.ID){
-                    //         next(new ApiError("Conflict!", 409));
-                    //         break;
-                    //     } 
-                    // })
+                    db.query("SELECT * FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "'", (error, row, fields) => {
+                        let userId = row[0].UserID;
+                        console.log(userId);
+                    
                     db.query("UPDATE `studentenhuis` SET `Naam` = '" + huis.name + "', `Adres` = '" + huis.address + "' WHERE `ID` = '" + req.params.id + "' AND `UserID` = '" + payload.sub.ID + "'", (error, rows, fields) => {
-                        db.query("SELECT * FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "'", (error, row, fields) => {
-                            try {
-                            if(row[0].UserID !== payload.sub.ID) {
-                                next(new ApiError("Conflict!", 409));
-                            }else{
-                                continue;
-                            }
-                        } catch(ex) {
-                            console.log(JSON.stringify(ex));
-                        }
-                        })
-                        if(rows === undefined){
+                        if(userId !== payload.sub.ID){
+                            next(new ApiError("Conflict!", 409))
+                        } else if(rows === undefined){
+                        //if(rows === undefined){
                             console.log("HuisID " + req.params.id + " bestaat niet.");
-                            next(new ApiError("Niet gevonden (HuisID bestaat niet", 404));
+                            next(new ApiError("Niet gevonden (HuisID bestaat niet)", 404));
                         } else {
                             if(error){
                                 next(error);
@@ -145,6 +131,7 @@ module.exports = {
                             }
                         }
                     })
+                })
                 } catch (ex) {
                     console.log(JSON.stringify(ex));
                     next(new ApiError(ex.message, 412));
