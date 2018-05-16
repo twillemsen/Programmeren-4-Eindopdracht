@@ -130,17 +130,13 @@ describe('Studentenhuis API GET all', () => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
 
-                let response = res.body;
+                let response = res.body[0];
 
-                // response.should.have.property('ID').deep.equals(res.body.ID);
-                // response.should.have.property('Naam').deep.equals(res.body.Naam);
-                // response.should.have.property('Adres').deep.equals(res.body.Adres);
-                // response.should.have.property('UserID').deep.equals(res.body.UserID);
-
-                // response.should.have.all.deep.keys('ID', 'Naam', 'Adres', 'UserID');
-
-
-                // DEZE TESTCASE KLOPT NOG NIET HELEMAAL 
+                response.should.have.property('ID');
+                response.should.have.property('Naam');
+                response.should.have.property('Adres');
+                response.should.have.property('UserID');
+ 
                 done();
             });
     });
@@ -231,11 +227,29 @@ describe('Studentenhuis API PUT', () => {
     });
 
     it('should return a studentenhuis with ID when posting a valid object', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+        const validToken = require('./authentication.routes.test').token;
+
+        chai.request(server)
+            .put('/api/studentenhuis/2')
+            .set('x-access-token', validToken)
+            .send({
+                "naam": "NieuweNaam",
+                "adres": "NieuwAdres1"
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+
+                let response = res.body;
+
+                response.should.have.property('ID').equals(res.body.ID);
+                response.should.have.property('Naam').equals(res.body.Naam);
+                response.should.have.property('Contact').equals(res.body.Contact);
+                response.should.have.property('Email').equals(res.body.Email);
+
+                done();
+            });
+    });
 
     it('should throw an error when naam is missing', (done) => {
         const validToken = require('./authentication.routes.test').token;
