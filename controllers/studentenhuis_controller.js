@@ -10,12 +10,8 @@ const ApiError = require('../model/ApiError');
 module.exports = {
     createStudentenhuis(req, res, next){
         console.log('studentenhuiscontroller.createStudentenhuis');
-        assert(req.body.name, 'A name must be provided');
-        assert(req.body.address, 'An address must be provided');
 
-        const name = req.body.name;
-        const address = req.body.address;
-        console.log('We got ' + name + ' ' + address);
+    
 
         const token = req.header('x-access-token') || ''
         auth.decodeToken(token, (err, payload) => {
@@ -23,6 +19,13 @@ module.exports = {
                 next(new ApiError("No token or wrong token provided", 401));
             } else {
                 try{
+                    assert(req.body.naam, 'A name must be provided');
+                    assert(req.body.adres, 'An address must be provided');
+                    assert(req.body.naam !== 'naam', 'gebruik (naam)');
+                    assert(req.body.adres !== 'adres', 'gebruik (adres)');
+                    const name = req.body.naam;
+                    const address = req.body.adres;
+                    console.log('We got ' + name + ' ' + address);
                     let huis = new Studentenhuis(name, address);
 
                     db.query("INSERT INTO `studentenhuis` (Naam, Adres, UserID) VALUES ('" + huis.name + "', '" + huis.address + "', '" + payload.sub.ID + "')", (error, rows, fields) => {
@@ -138,5 +141,48 @@ module.exports = {
                 }
             }
         });
+    },
+
+    deleteStudentenhuis(req, res, next){
+        console.log('studentenhuiscontroller.deleteStudentenhuis');
+        const token = req.header('x-access-token') || ''
+        auth.decodeToken(token, (err, payload) => {
+            if(err) {
+                next(new ApiError("No token or wrong token provided", 401));
+            } else {
+                try{
+                    db.query("SELECT * FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "'", (error, rows, fields) => {
+                        console.log(rows);
+                        
+                        if (!Array.isArray(rows) || !rows.length){
+                            next(new ApiError("Item bestaat niet", 404));
+                        // } else if(error){
+                        //     next(error);
+                        } else {
+                            let userId = rows[0].UserID;
+                            db.query("DELETE FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "' AND `UserID` = '" + payload.sub.ID + "'", (error, row, fields) => {
+                                if(row == undefined){
+                                    next(new ApiError("Item bestaat niet", 404));
+                                } else if(userId !== payload.sub.ID){
+                                    next(new ApiError("Gebruiker mag dit item niet verwijderen", 409));
+                                } else if (row == undefined) {
+                                    next(new ApiError("Item bestaat niet"), 404);    
+                                } else if(error){
+                                    next(error);
+                                } else {
+                                    res.status(200).json({"message": "Item verwijderd"}).end();
+                                }
+                            })
+                        
+                        }
+                    
+                    });
+                
+                }catch(ex){
+                    next(new ApiError(ex.message, 412));
+                }
+            }
+        
+    })
     }
 }

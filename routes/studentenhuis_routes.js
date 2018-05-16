@@ -6,5 +6,6 @@ routes.post('/studentenhuis', studentenhuiscontroller.createStudentenhuis);
 routes.get('/studentenhuis', studentenhuiscontroller.getStudentenhuizen);
 routes.get('/studentenhuis/:id', studentenhuiscontroller.getStudentenhuisById);
 routes.put('/studentenhuis/:id', studentenhuiscontroller.updateStudentenhuis);
+routes.delete('/studentenhuis/:id', studentenhuiscontroller.deleteStudentenhuis);
 
 module.exports = routes
