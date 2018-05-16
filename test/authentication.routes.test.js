@@ -10,7 +10,6 @@ chai.use(chaiHttp);
 
 // After successful registration we have a valid token. We export this token
 // for usage in other testcases that require login.
-let validToken
 
 describe('Registration', () => {
     it('should return a token when providing valid information', (done) => {
@@ -32,6 +31,11 @@ describe('Registration', () => {
                 response.should.have.property('token').equals(validToken);
                 response.should.have.property('email').equals('abc@def.nl');
 
+                validToken = res.body.token
+                module.exports = {
+                         token: validToken
+                    }
+
                 done();
             });
 
@@ -39,9 +43,6 @@ describe('Registration', () => {
         // andere testcases voor beveiligde routes door het hier te exporteren
         // en in andere testcases te importeren via require.
         // validToken = res.body.token
-        module.exports = {
-            token: validToken
-        }
     });
 
     it('should return an error on GET request', (done) => {
