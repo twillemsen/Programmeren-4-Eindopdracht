@@ -32,13 +32,6 @@ app.use('/api', maaltijd_routes);
 
 app.use('/api', deelnemer_routes);
 
-// Test endpoint:
-app.get('/test', (req, res, next) => {
-    res.status(200).json({
-        "Test": "This is a test endpoint"
-    });
-});
-
 app.use('*', (req, res, next) => {
     console.log('Endpoint does not exist');
     next(new ApiError('Endpoint bestaat niet', 404));
