@@ -4,16 +4,19 @@ const ApiError = require('./ApiError');
 class Maaltijd {
     constructor(naam, beschrijving, ingredienten, allergie, prijs) {
         try {
-            assert(typeof (name) === 'string', 'naam must be a string');
+            assert(typeof (naam) === 'string', 'naam must be a string');
             assert(typeof (beschrijving) === 'string', 'beschrijving must be a string');
             assert(typeof (ingredienten) === 'string', 'ingredienten must be a string');
             assert(typeof (allergie) === 'string', 'allergie must be a string');
-            assert(typeof (prijs) === 'int', 'prijs must be an int');
+            assert(typeof (prijs) === 'number', 'prijs must be an int');
         }
         catch (ex) {
-            const error = new ApiError('Een of meer properties in de request body ontbreken of zijn foutief', 412);
-            res.status(412).send(error);
-            return;
+            if(ex instanceof assert.AssertionError){
+                throw(new ApiError(ex.message, 412))
+            }else{
+                console.log('Some other error: ' + ex.message);
+                throw(new ApiError(ex.message, 500))
+            }
         }
 
         this.naam = naam.trim();

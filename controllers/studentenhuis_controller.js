@@ -80,7 +80,7 @@ module.exports = {
                 if(rows[0] === undefined){
                     console.log("HuisId " + req.params.id + " bestaat niet." );
                     //res.status(404).json(new ApiError('Niet gevonden (HuisID bestaat niet)', 404));
-                    next(new ApiError("Niet gevonden (Huis ID bestaat niet", 404));
+                    next(new ApiError("Niet gevonden (Huis ID bestaat niet)", 404));
                 } else {
                     if(error){
                         next(error);
@@ -99,8 +99,8 @@ module.exports = {
     updateStudentenhuis(req, res, next){
         console.log('studentenhuiscontroller.updateStudentenhuis');
 
-        let naam = req.body.name;
-        let adres = req.body.address;
+        let naam = req.body.naam;
+        let adres = req.body.adres;
         console.log('Got ' + naam + " en " + adres);
 
         const token = req.header('x-access-token') || ''
@@ -114,17 +114,19 @@ module.exports = {
                     assert(adres, 'An address must be provided');
                     let huis = new Studentenhuis(naam, adres);
                     db.query("SELECT * FROM `studentenhuis` WHERE `ID` = '" + req.params.id + "'", (error, row, fields) => {
-                        let userId = row[0].UserID;
-                        console.log(userId);
+                        if(!Array.isArray(row) || !row.length){
+                            //if(rows === undefined){
+                                console.log("HuisID " + req.params.id + " bestaat niet.");
+                                next(new ApiError("Niet gevonden (HuisID bestaat niet)", 404));
+                            } else if(row[0].UserID !== payload.sub.ID) {
+                                // let userId = row[0].UserID;
+                                // console.log(userId);
+                                next(new ApiError("Conflict!", 409))
+                            } else {
+                        
                     
                     db.query("UPDATE `studentenhuis` SET `Naam` = '" + huis.name + "', `Adres` = '" + huis.address + "' WHERE `ID` = '" + req.params.id + "' AND `UserID` = '" + payload.sub.ID + "'", (error, rows, fields) => {
-                        if(userId !== payload.sub.ID){
-                            next(new ApiError("Conflict!", 409))
-                        } else if(rows === undefined){
-                        //if(rows === undefined){
-                            console.log("HuisID " + req.params.id + " bestaat niet.");
-                            next(new ApiError("Niet gevonden (HuisID bestaat niet)", 404));
-                        } else {
+                         
                             if(error){
                                 next(error);
                             } else {
@@ -132,8 +134,9 @@ module.exports = {
                                     res.status(200).json(rows[0]).end();
                                 })
                             }
-                        }
+                        
                     })
+                }
                 })
                 } catch (ex) {
                     console.log(JSON.stringify(ex));

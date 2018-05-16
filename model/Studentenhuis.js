@@ -11,10 +11,10 @@ class Studentenhuis {
             assert(hasNumber(address), 'Address must contain a number');
         }catch(ex) {
             if(ex instanceof assert.AssertionError){
-                throw(new ApiError(ex.toString(), 412))
+                throw(new ApiError(ex.message, 412))
             }else{
-                console.log('Some other error: ' + ex.toString());
-                throw(new ApiError(ex.toString(), 500))
+                console.log('Some other error: ' + ex.message);
+                throw(new ApiError(ex.message, 500))
             }
         }
 

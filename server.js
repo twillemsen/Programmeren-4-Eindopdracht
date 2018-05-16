@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 // const routes
 const studentenhuis_routes = require('./routes/studentenhuis_routes');
 const auth_routes = require('./routes/authentication.routes');
-const maaltijd_routes = require('./routes/maaltijd.routes');
+const maaltijd_routes = require('./routes/maaltijd_routes');
 // authentication controller
 const auth_controller = require('./controllers/authentication.controller');
 // const ApiError
@@ -38,7 +38,7 @@ app.get('/test', (req, res, next) => {
 
 app.use('*', (req, res, next) => {
     console.log('Endpoint does not exist');
-    next('Endpoint does not exist');
+    next(new ApiError('Endpoint bestaat niet', 404));
 })
 
 
