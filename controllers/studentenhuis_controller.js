@@ -80,7 +80,7 @@ module.exports = {
                 if(rows[0] === undefined){
                     console.log("HuisId " + req.params.id + " bestaat niet." );
                     //res.status(404).json(new ApiError('Niet gevonden (HuisID bestaat niet)', 404));
-                    next(new ApiError("Niet gevonden (Huis ID bestaat niet", 404));
+                    next(new ApiError("Niet gevonden (Huis ID bestaat niet)", 404));
                 } else {
                     if(error){
                         next(error);
@@ -99,8 +99,8 @@ module.exports = {
     updateStudentenhuis(req, res, next){
         console.log('studentenhuiscontroller.updateStudentenhuis');
 
-        let naam = req.body.name;
-        let adres = req.body.address;
+        let naam = req.body.naam;
+        let adres = req.body.adres;
         console.log('Got ' + naam + " en " + adres);
 
         const token = req.header('x-access-token') || ''
@@ -119,7 +119,7 @@ module.exports = {
                     
                     db.query("UPDATE `studentenhuis` SET `Naam` = '" + huis.name + "', `Adres` = '" + huis.address + "' WHERE `ID` = '" + req.params.id + "' AND `UserID` = '" + payload.sub.ID + "'", (error, rows, fields) => {
                         if(userId !== payload.sub.ID){
-                            next(new ApiError("Conflict!", 409))
+                            next(new ApiError("Deze gebruiker mag dit studentenhuis niet aanpassen", 409));
                         } else if(rows === undefined){
                         //if(rows === undefined){
                             console.log("HuisID " + req.params.id + " bestaat niet.");
