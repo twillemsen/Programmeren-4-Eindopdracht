@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const studentenhuis_routes = require('./routes/studentenhuis_routes');
 const auth_routes = require('./routes/authentication.routes');
 const maaltijd_routes = require('./routes/maaltijd_routes');
+const deelnemer_routes = require('./routes/deelnemer_routes');
 // authentication controller
 const auth_controller = require('./controllers/authentication.controller');
 // const ApiError
@@ -28,6 +29,8 @@ app.all('*', auth_controller.validateToken);
 app.use('/api', studentenhuis_routes);
 
 app.use('/api', maaltijd_routes);
+
+app.use('/api', deelnemer_routes);
 
 // Test endpoint:
 app.get('/test', (req, res, next) => {
