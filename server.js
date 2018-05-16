@@ -39,6 +39,7 @@ app.use('*', (req, res, next) => {
 
 
 app.use(function (error, req, res, next){
+    console.log('Catch-all error handler called');
     let end = res.end;
     let status = error.code;
     console.error(JSON.stringify(error));
